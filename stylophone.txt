@@ -1,0 +1,160 @@
+// Code along tutorial:
+// Examples from tympanus.net/codrops/2013/06/10/web-audio-stylophone/
+var context = new webkitAudioContext();
+var oscillator = context.createOscillator();
+oscillator.type = oscillator.SQUARE;
+// There are other values you can change the oscillator to, such as ‘SAWTOOTH’ and ‘TRIANGLE’. 
+// You may want to customize your stylophone by using a different type of wave.
+
+// With the Web Audio API, our speakers are represented by “context.destination”
+oscillator.connect(context.destination); // Connect our oscillator to the speakers.
+
+// Start it:
+oscillator.noteOn(0);
+// Stop it:
+oscillator.noteOff(0);
+
+// These methods have been recently renamed to start() and stop() in the Web Audio API spec
+// Start it:
+oscillator.start(0);
+// Stop it:
+oscillator.stop(0);
+
+// Control volume by adding a Gain Node to our chain
+var gainNode = context.createGainNode();
+
+gainNode.value = 0.25;
+
+oscillator.connect(gainNode); // Connect oscillator to Gain Node
+gainNode.connect(context.destination); // Connect Gain Node to speakers
+
+// Use Raphael.js and Qwery Hancock for the graphical user interface
+//<script src="js/raphael.js"></script>
+//<script src="js/qwerty-hancock.min.js"></script>
+
+// Create keyboard element in html <div id="keyboard"><div>
+
+// Instantiate keyboard
+var keyboard = qwertyHancock({
+	id: 'keyboard',
+	height: 100,
+	width: 568,
+	startNote: 'A2',
+	octaves: 1.7,
+	whiteKeyColour: '#eee',
+	blackKeyColour: '#ddd',
+	blackKeyWidth: 40,
+	blackKeyHeight: 60,
+	hoverColour: 'silver',
+	keyboardLayout: 'en'
+});
+
+keyboard.keyDown(function (note, frequency) {
+    // Key on keyboard has been pressed.
+});
+ 
+keyboard.keyUp(function (note, frequency) {
+    // Key on keyboard has been depressed.
+});
+
+//Because web audio API oscillators don't take up much memory and are unusable after the noteOff method is called, we will create an oscillator each time a key is pressed then destroy it once the user lets go. A function is the best way to do this.
+
+//Note that order and placement of scripts is important. Things didn't work for me until I placed the scripts below the keyboard div before the closing body tag.
+
+//Now, add code to make pitches change with different key hits. 
+
+var playNote = function (frequency) {
+var oscillator = context.createOscillator(),
+gainNode = context.createGainNode();
+ 
+oscillator.type = oscillator.SQUARE;        
+oscillator.frequency.value = frequency;
+ 
+// Set volume of the oscillator.
+gainNode.gain.value = 0.3;
+ 
+// Route oscillator through gain node to speakers.
+oscillator.connect(gainNode);
+gainNode.connect(context.destination);
+ 
+oscillator.noteOn(0);
+ 
+currentOscillator = oscillator;
+};
+ 
+var stopNote = function () {
+currentOscillator.noteOff(0); // Stop oscillator after 0 seconds.
+currentOscillator.disconnect();
+}
+ 
+keyboard.keyDown(function (note, frequency) {
+playNote(frequency);    
+});
+ 
+keyboard.keyUp(function (note, frequency) {
+stopNote();
+});
+
+// I added a console.log to show the frequency being played. This made me realize that I can use special tuning... And might want to round?
+
+// I noticed if I hit a keyboard letter while clicking, the note wont stop, fixed this with: 
+	// Disconnect existing oscillator if there is one.
+	  if (currentOscillator) {
+	  	currentOscillator.disconnect();
+	  }
+
+// noticed holding control while hitting a note holds the note
+
+
+Pythagorean frequencies = {
+              C1: 128,
+              C1s: 136.68,
+              D1: 144,
+              D1s: 153.77,
+              E1: 162,
+              F1: 176,
+              F1s: 179.79,
+              G1: 192,
+              G1s: 205.03,
+              A1: 216,
+              A1s: 227.55,
+              B1: 243,
+              C2: 256,
+              C2s: 266.66,
+              D2: 288,
+              D2s: 300,
+              E2: 324,
+              F2: 352,
+              F2s: 364.5,
+              G2: 384,
+              G2s: 400,
+              A2: 432,
+              A2s: 444.4,
+              B2: 486,
+              C3: 512,
+              C3s: 546.75,
+              D3: 576,
+              D3s: 615.09,
+              E3: 648,
+              F3: 704,
+              F3s: 729,
+              G3: 768,
+              G3s: 820.125,
+              A3: 864,
+              A3s: 922.64,
+              B3: 972
+            };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
