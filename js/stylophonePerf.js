@@ -36,7 +36,7 @@ var playNote = function (frequency) {
   oscillator.frequency.value = frequency;
 
   // Set volume of oscillator
-gainNode.gain.value = 0.3;
+// gainNode.gain.value = 0.3;
 
 // Route oscillator through gain node to speakers
 oscillator.connect(gainNode);
